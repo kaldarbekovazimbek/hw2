@@ -3,19 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\NotFoundException;
-use App\Exceptions\SuccessException;
 use App\Http\Requests\FuelSensorRequest;
 use App\Http\Resources\FuelSensor\FuelSensorCollection;
 use App\Http\Resources\FuelSensor\FuelSensorResource;
 use App\Models\FuelSensor;
 use App\Models\Vehicle;
-use Illuminate\Http\Request;
-use function PHPUnit\Framework\assertGreaterThanOrEqual;
+use Illuminate\Http\JsonResponse;
 
 class FuelSensorController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * @throws NotFoundException
      */
     public function index(): FuelSensorCollection
     {
@@ -47,6 +46,7 @@ class FuelSensorController extends Controller
 
     /**
      * Display the specified resource.
+     * @throws NotFoundException
      */
     public function show(int $fuelSensorId): FuelSensorResource
     {
@@ -59,6 +59,7 @@ class FuelSensorController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @throws NotFoundException
      */
     public function update(FuelSensorRequest $request, int $fuelSensorId): FuelSensorResource
     {
@@ -75,8 +76,9 @@ class FuelSensorController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @throws NotFoundException
      */
-    public function destroy(int $fuelSensorId): \Illuminate\Http\JsonResponse
+    public function destroy(int $fuelSensorId): JsonResponse
     {
         $fuelSensor = FuelSensor::query()->find($fuelSensorId);
         if ($fuelSensor === null) {
@@ -87,6 +89,9 @@ class FuelSensorController extends Controller
         ]);
     }
 
+    /**
+     * @throws NotFoundException
+     */
     public function getVehicleSensors(int $vehicleId): FuelSensorCollection
     {
         /**
