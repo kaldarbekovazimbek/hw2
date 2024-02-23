@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('app:birthday-greetings')->everyMinute();
+
+        $schedule->command('app:birthday-greetings')->dailyAt('9:00');
     }
 
     /**

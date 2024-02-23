@@ -32,17 +32,28 @@ class BirthdayGreetings extends Command
     public function handle(): void
     {
 
-        $toEmail = 'kaldarbekovazimbek@yandex.ru';
-        $subject = 'Birthday greetings';
-        $message = 'Happy birthday!';
+        $users = User::query()->whereMonth('birthday', now()->month)->whereDay('birthday', now()->day)->get();
 
-        Mail::raw($message, function ($message) use ($toEmail, $subject) {
-            $message->to($toEmail)->subject($subject);
+        foreach ($users as $user){
+            $email = $user->email;
+            $name = $user->name;
+        }
+
+        /**
+         * @var string $name
+         */
+        $message = "Happy birthday {$name}!";
+
+        /**
+         * @var string $email
+         */
+        Mail::raw($message, function ($message) use ($email, $name) {
+            $message->to($email, $name)->subject('Birthday greetings');
         });
+
 
         $this->info('Birthday greetings sent successfully.');
 
-//        return CommandAlias::SUCCESS;
     }
 
 }

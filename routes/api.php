@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 Route::middleware('check.token')->group(function (){
     Route::get('/organizations', [OrganizationController::class, 'index'])->name('organization.index');
     Route::post('/organizations', [OrganizationController::class, 'store'])->name('organization.store');
@@ -45,7 +44,6 @@ Route::middleware('check.token')->group(function (){
     Route::match(['put','patch'],'/sensors/{sensorId}', [FuelSensorController::class, 'update'])->name('sensors.update');
     Route::delete('/sensors/{sensorId}', [FuelSensorController::class, 'destroy'])->name('sensors.update');
     Route::get('/vehicles/{vehiclesId}/sensors', [FuelSensorController::class, 'getVehicleSensors'])->name('sensors.getVehicleSensors');
-
 
 });
 

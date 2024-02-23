@@ -2,107 +2,85 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\NotFoundException;
+use App\Contracts\FuelSensorRepositoryInterface;
+use App\DTO\FuelSensorDTO;
+use App\Exceptions\DuplicateException;
 use App\Http\Requests\FuelSensorRequest;
 use App\Http\Resources\FuelSensor\FuelSensorCollection;
 use App\Http\Resources\FuelSensor\FuelSensorResource;
-use App\Models\FuelSensor;
-use App\Models\Vehicle;
+use App\Services\FuelSensor\CreateFuelSensorService;
+use App\Services\FuelSensor\UpdateFuelSensorService;
 use Illuminate\Http\JsonResponse;
 
 class FuelSensorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @throws NotFoundException
-     */
+    private FuelSensorRepositoryInterface $fuelSensorRepository;
+    private CreateFuelSensorService $createFuelSensorService;
+    private UpdateFuelSensorService $updateFuelSensorService;
+
+    public function __construct(
+        FuelSensorRepositoryInterface $fuelSensorRepository,
+        CreateFuelSensorService       $createFuelSensorService,
+        UpdateFuelSensorService       $updateFuelSensorService
+    )
+    {
+        $this->createFuelSensorService = $createFuelSensorService;
+        $this->fuelSensorRepository = $fuelSensorRepository;
+        $this->updateFuelSensorService = $updateFuelSensorService;
+    }
+
     public function index(): FuelSensorCollection
     {
-        $fuelSensors = FuelSensor::all();
+        $fuelSensors = $this->fuelSensorRepository->getAll();
 
-        if ($fuelSensors === null) {
-            throw new NotFoundException('Fuel sensors not found');
-        }
         return new FuelSensorCollection($fuelSensors);
 
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws DuplicateException
      */
     public function store(FuelSensorRequest $request): FuelSensorResource
     {
-        /**
-         * @var FuelSensor $fuelSensor
-         */
         $validatedData = $request->validated();
 
-        $fuelSensor = FuelSensor::query()->create($validatedData);
-
-        $fuelSensor->vehicle()->associate($request->input('vehicle_id'));
+        $fuelSensor = $this->createFuelSensorService->createFuelSensor(FuelSensorDTO::fromArray($validatedData));
 
         return new FuelSensorResource($fuelSensor);
     }
 
-    /**
-     * Display the specified resource.
-     * @throws NotFoundException
-     */
+
     public function show(int $fuelSensorId): FuelSensorResource
     {
-        $fuelSensor = FuelSensor::query()->find($fuelSensorId);
-        if ($fuelSensor === null) {
-            throw new NotFoundException('Fuel sensor not found', 404);
-        }
+        $fuelSensor = $this->fuelSensorRepository->getById($fuelSensorId);
+
         return new FuelSensorResource($fuelSensor);
     }
 
     /**
-     * Update the specified resource in storage.
-     * @throws NotFoundException
+     * @throws DuplicateException
      */
     public function update(FuelSensorRequest $request, int $fuelSensorId): FuelSensorResource
     {
-        $fuelSensor = FuelSensor::query()->find($fuelSensorId);
-        if ($fuelSensor === null) {
-            throw new NotFoundException('Fuel sensor not found', 404);
-        }
+
         $validatedData = $request->validated();
 
-        $fuelSensor->update($validatedData);
+        $fuelSensor = $this->updateFuelSensorService->updateFuelSensor($fuelSensorId, FuelSensorDTO::fromArray($validatedData));
 
         return new FuelSensorResource($fuelSensor);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     * @throws NotFoundException
-     */
     public function destroy(int $fuelSensorId): JsonResponse
     {
-        $fuelSensor = FuelSensor::query()->find($fuelSensorId);
-        if ($fuelSensor === null) {
-            throw new NotFoundException('Fuel sensor not found', 404);
-        }
-        return response()->json([
-            'message'=>'Deleted',
-        ]);
+       return $this->fuelSensorRepository->delete($fuelSensorId);
+
     }
 
-    /**
-     * @throws NotFoundException
-     */
     public function getVehicleSensors(int $vehicleId): FuelSensorCollection
     {
-        /**
-         * @var Vehicle $vehicle
-         */
-        $vehicle = Vehicle::query()->find($vehicleId);
-        if ($vehicle === null) {
-            throw new NotFoundException('Vehicle not found', 404);
-        }
-        $fuelSensor = $vehicle->fuelSensors()->get();
+        $vehicleSensors = $this->fuelSensorRepository->getVehicleSensors($vehicleId);
 
-        return new FuelSensorCollection($fuelSensor);
+        return new FuelSensorCollection($vehicleSensors);
     }
 }

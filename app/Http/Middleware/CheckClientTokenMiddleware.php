@@ -22,7 +22,7 @@ class CheckClientTokenMiddleware
         $token = config('api_tokens.token');
 
         if ($request->header('Api-Token') !== $token){
-            throw new EnsureTokenException('Forbidden!', 403);
+            throw new EnsureTokenException('Forbidden!');
         }
 
         return $next($request);

@@ -2,29 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\VehicleRepositoryInterface;
+use App\DTO\VehicleDTO;
+use App\Exceptions\DuplicateException;
 use App\Exceptions\NotFoundException;
-use App\Exceptions\SuccessException;
 use App\Http\Requests\VehicleRequest;
 use App\Http\Resources\Vehicle\VehicleCollection;
 use App\Http\Resources\Vehicle\VehicleResource;
-use App\Models\Organization;
 use App\Models\Vehicle;
-use Nette\ArgumentOutOfRangeException;
+use App\Services\Vehicle\CreateVehicleService;
+use App\Services\Vehicle\UpdateVehicleService;
+
 
 class VehicleController extends Controller
 {
+    private VehicleRepositoryInterface $vehicleRepository;
+    private CreateVehicleService $createVehicleService;
+    private UpdateVehicleService $updateVehicleService;
+
+    public function __construct(
+        VehicleRepositoryInterface $vehicleRepository,
+        CreateVehicleService       $createVehicleService,
+        UpdateVehicleService       $updateVehicleService
+    )
+    {
+        $this->vehicleRepository = $vehicleRepository;
+        $this->createVehicleService = $createVehicleService;
+        $this->updateVehicleService = $updateVehicleService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): VehicleCollection
     {
-        $vehicle = Vehicle::all();
+
+        $vehicle = $this->vehicleRepository->getAll();
 
         return new VehicleCollection($vehicle);
+
     }
 
     /**
      * Store a newly created resource in storage.
+     * @throws DuplicateException
      */
     public function store(VehicleRequest $request): VehicleResource
     {
@@ -33,42 +54,31 @@ class VehicleController extends Controller
          */
         $validatedData = $request->validated();
 
-        $vehicle = Vehicle::query()->create($validatedData);
-
-        $vehicle->organizations()->associate($request->input('organization_id'));
+        $vehicle = $this->createVehicleService->createVehicle(VehicleDTO::fromArray($validatedData));
 
         return new VehicleResource($vehicle);
     }
-    /**
-     * Display the specified resource.
-     */
+
     public function show(int $vehicleId): VehicleResource
     {
-        $vehicle = Vehicle::query()->find($vehicleId);
-
-        if ($vehicle === null){
-            throw new NotFoundException('Vehicle not found', 404);
-        }
+        $vehicle = $this->vehicleRepository->getById($vehicleId);
 
         return new VehicleResource($vehicle);
 
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * @throws DuplicateException
+     * @throws NotFoundException
      */
     public function update(VehicleRequest $request, int $vehicleId): VehicleResource
     {
-        $vehicle = Vehicle::query()->find($vehicleId);
-        if ($vehicle === null){
-            throw new NotFoundException('Vehicle not found', 404);
-        }
         $validatedData = $request->validated();
 
-        $vehicle->update($validatedData);
+        $vehicle = $this->updateVehicleService->updateVehicle($vehicleId, VehicleDTO::fromArray($validatedData));
 
         return new VehicleResource($vehicle);
-
     }
 
     /**
@@ -76,31 +86,14 @@ class VehicleController extends Controller
      */
     public function destroy(int $vehicleId)
     {
-        $vehicle = Vehicle::query()->find($vehicleId);
-        if ($vehicle === null){
-            throw new NotFoundException('Vehicle not found', 404);
-        }
-        $vehicle->delete();
+        return $this->vehicleRepository->delete($vehicleId);
 
-        return response()->json([
-            'message'=>'Deleted',
-        ]);
-
-//        throw new SuccessException('Vehicle was deleted', 200);
     }
 
     public function getOrganizationVehicles(int $organizationId): VehicleCollection
     {
-        /**
-         * @var Organization $organization
-         */
-        $organization = Organization::query()->find($organizationId);
+        $organizationVehicles = $this->vehicleRepository->getOrganizationVehicles($organizationId);
 
-        if ($organization === null){
-            throw new NotFoundException('Organization not found', 404);
-        }
-        $vehicles = $organization->vehicles()->get();
-
-        return new VehicleCollection($vehicles);
+        return new VehicleCollection($organizationVehicles);
     }
 }

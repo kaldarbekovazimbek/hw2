@@ -8,11 +8,12 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class EnsureTokenException extends Exception
 {
+    private int $forbidden = 403;
     public function render(): JsonResponse
     {
         return response()->json([
             'error'=>$this->getMessage(),
-            'code'=>$this->getCode(),
+            'code'=>$this->forbidden,
         ], ResponseAlias::HTTP_FORBIDDEN);
     }
 }

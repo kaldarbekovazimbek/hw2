@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property Vehicle[] $vehicles
+ * @property int $id
+ * @property string $model
+ * @property int $serial_number
+ * @property int $vehicle_id
  */
 class FuelSensor extends Model
 {

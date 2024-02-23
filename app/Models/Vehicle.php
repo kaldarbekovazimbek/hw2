@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property Organization[] $organizations
+ * @property int $id
+ * @property string $model
+ * @property int $serial_number
+ * @property int $organization_id
+ */
 class Vehicle extends Model
 {
     use HasFactory;
