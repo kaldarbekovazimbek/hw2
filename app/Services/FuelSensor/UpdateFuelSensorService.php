@@ -21,9 +21,9 @@ class UpdateFuelSensorService
      */
     public function updateFuelSensor(int $fuelSensorId, FuelSensorDTO $fuelSensorDTO): FuelSensor
     {
-        $sensorNumber = $this->fuelSensorRepository->getFuelSensorBySerialNumber($fuelSensorDTO->getSerialNumber());
+        $existingSensorNumber = $this->fuelSensorRepository->getFuelSensorBySerialNumber($fuelSensorDTO->getSerialNumber());
 
-        if ($sensorNumber !== null) {
+        if ($existingSensorNumber !== null && $existingSensorNumber->id !== $fuelSensorId) {
             throw new DuplicateException(__('messages.object_with_serial_number_exists'), 409);
         }
         return $this->fuelSensorRepository->update($fuelSensorId, $fuelSensorDTO);

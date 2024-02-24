@@ -14,16 +14,11 @@ class VehicleRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'model' => ['required', 'string', 'max:50'],
-            'serial_number' => ['required', 'integer', 'max:100000000'],
+            'serial_number' => ['required', 'integer'],
             'organization_id' => ['required', 'integer']
         ];
     }

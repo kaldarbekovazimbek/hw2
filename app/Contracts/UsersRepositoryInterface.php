@@ -23,7 +23,6 @@ interface UsersRepositoryInterface
 
     public function getByEmail(string $email);
 
-    public function getByPhone(string $phone);
 
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Contracts\UsersRepositoryInterface;
 use App\DTO\UsersDTO;
 use App\Exceptions\DuplicateException;
@@ -21,7 +22,8 @@ class UserController extends Controller
     public function __construct(
         UsersRepositoryInterface $repository,
         CreateUserService        $createUserService,
-        UpdateUserService        $updateUserService
+        UpdateUserService        $updateUserService,
+
     )
     {
         $this->repository = $repository;

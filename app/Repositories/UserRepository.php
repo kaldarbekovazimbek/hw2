@@ -51,7 +51,6 @@ class UserRepository implements UsersRepositoryInterface
         $user->name = $usersDTO->getName();
         $user->birthday = $usersDTO->getBirthday();
         $user->email = $usersDTO->getEmail();
-        $user->phone = $usersDTO->getPhone();
         $user->password = bcrypt($usersDTO->getPassword());
         $user->save();
 
@@ -64,9 +63,9 @@ class UserRepository implements UsersRepositoryInterface
     public function update(int $userId, UsersDTO $usersDTO): ?User
     {
         $user = $this->getById($userId);
+        $user->name = $usersDTO->getName();
         $user->birthday = $usersDTO->getBirthday();
         $user->email = $usersDTO->getEmail();
-        $user->phone = $usersDTO->getPhone();
         $user->password = bcrypt($usersDTO->getPassword());
         $user->save();
 
@@ -92,20 +91,12 @@ class UserRepository implements UsersRepositoryInterface
     public function getByEmail(string $email): ?User
     {
         /**
-         * @var User|null $userEmail
+         * @var User|null $user
+         * @var
          */
-        $userEmail = User::query()->where('email', $email)->first();
+        $user = User::query()->where('email', '=', $email)->first();
 
-        return $userEmail;
-    }
-
-    public function getByPhone(string $phone): ?User
-    {
-        /**
-         * @var User|null $userPhone
-         */
-        $userPhone = User::query()->where('phone', $phone)->first();
-        return $userPhone;
+        return $user;
     }
 
     /**

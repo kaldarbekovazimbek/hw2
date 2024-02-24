@@ -50,6 +50,9 @@ public function __construct(CreateOrganizationService $createOrganizationService
 
     }
 
+    /**
+     * @throws NotFoundException
+     */
     public function show(int $organizationId): OrganizationResource|JsonResponse
     {
         $organization = $this->organizationRepository->getById($organizationId);

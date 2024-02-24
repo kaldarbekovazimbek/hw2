@@ -74,6 +74,7 @@ class VehicleController extends Controller
      */
     public function update(VehicleRequest $request, int $vehicleId): VehicleResource
     {
+
         $validatedData = $request->validated();
 
         $vehicle = $this->updateVehicleService->updateVehicle($vehicleId, VehicleDTO::fromArray($validatedData));

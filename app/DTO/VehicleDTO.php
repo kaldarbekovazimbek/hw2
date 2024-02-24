@@ -30,16 +30,6 @@ class VehicleDTO
         return $this->organizationId;
     }
 
-    public function toArray(): array
-    {
-        return [
-            'model' => $this->model,
-            'serial_number' => $this->serialNumber,
-            'organization_id' => $this->organizationId,
-            // Другие поля...
-        ];
-    }
-
     public static function fromArray($date): static
     {
         return new static(

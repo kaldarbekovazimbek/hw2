@@ -22,9 +22,9 @@ class UpdateOrganizationService
      */
     public function updateOrganization(int $organizationId, OrganizationDTO $organizationDTO): Organization
     {
-        $organization = $this->organizationRepository->getByPhone($organizationDTO->getPhone());
+        $existingOrganization = $this->organizationRepository->getByPhone($organizationDTO->getPhone());
 
-        if ($organization === null){
+        if ($existingOrganization !== null && $existingOrganization->id !== $organizationId){
             throw new NotFoundException(__('messages.object_with_serial_number_exists'), 409);
         }
 

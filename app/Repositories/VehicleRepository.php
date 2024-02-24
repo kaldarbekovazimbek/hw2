@@ -12,16 +12,10 @@ use Illuminate\Http\JsonResponse;
 
 class VehicleRepository implements VehicleRepositoryInterface
 {
-
-    /**
-     * @throws NotFoundException
-     */
     public function getAll(): Collection
     {
         $vehicle = Vehicle::all();
-        if ($vehicle===null){
-            throw new NotFoundException(__('messages.object_not_found'),400);
-        }
+
         return $vehicle;
     }
 
@@ -61,7 +55,6 @@ class VehicleRepository implements VehicleRepositoryInterface
         $vehicle->serial_number = $vehicleDTO->getSerialNumber();
         $vehicle->organization_id = $vehicleDTO->getOrganizationId();
         $vehicle->save();
-
         return $vehicle;
     }
 
@@ -107,4 +100,5 @@ class VehicleRepository implements VehicleRepositoryInterface
         }
         return $organization->vehicles()->get();
     }
+
 }

@@ -16,16 +16,20 @@ class UpdateUserService
         $this->usersRepository = $usersRepository;
     }
 
+    /**
+     * @throws DuplicateException
+     */
     public function updateUser(int $userId, UsersDTO $usersDTO): ?User
     {
-        $usersPhone = $this->usersRepository->getByPhone($usersDTO->getPhone());
-        $usersEmail = $this->usersRepository->getByEmail($usersDTO->getEmail());
+        /**
+         * @var User $existingUsersEmail
+         */
+        $existingUsersEmail = $this->usersRepository->getByEmail($usersDTO->getEmail());
 
-        if ($usersPhone !== null or $usersEmail !== null) {
-            throw new DuplicateException('messages.object_with_number_or_email_exists', 409);
+        if ($existingUsersEmail !== null && $existingUsersEmail->id !== $userId) {
+            throw new DuplicateException(__('messages.object_with_email_exists', 409));
         }
 
-
-        return $this->usersRepository->create($usersDTO);
+        return $this->usersRepository->update($userId, $usersDTO);
     }
 }

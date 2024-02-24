@@ -11,6 +11,7 @@ use App\Repositories\VehicleRepository;
 class UpdateVehicleService
 {
     private VehicleRepository $vehicleRepository;
+
     public function __construct(VehicleRepository $vehicleRepository)
     {
         $this->vehicleRepository = $vehicleRepository;
@@ -23,12 +24,11 @@ class UpdateVehicleService
      */
     public function updateVehicle(int $vehicleId, VehicleDTO $vehicleDTO): ?Vehicle
     {
-        $vehicle = $this->vehicleRepository->getVehicleByNumber($vehicleDTO->getSerialNumber());
+        $existingVehicle = $this->vehicleRepository->getVehicleByNumber($vehicleDTO->getSerialNumber());
 
-        if ($vehicle !== null){
+        if ($existingVehicle !== null && $existingVehicle->id != $vehicleId) {
             throw new DuplicateException(__('messages.object_with_serial_number_exists'), 409);
         }
-
         return $this->vehicleRepository->update($vehicleId, $vehicleDTO);
 
     }
