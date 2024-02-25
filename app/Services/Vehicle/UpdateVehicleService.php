@@ -4,7 +4,6 @@ namespace App\Services\Vehicle;
 
 use App\DTO\VehicleDTO;
 use App\Exceptions\DuplicateException;
-use App\Exceptions\NotFoundException;
 use App\Models\Vehicle;
 use App\Repositories\VehicleRepository;
 
@@ -20,7 +19,6 @@ class UpdateVehicleService
 
     /**
      * @throws DuplicateException
-     * @throws NotFoundException
      */
     public function updateVehicle(int $vehicleId, VehicleDTO $vehicleDTO): ?Vehicle
     {
