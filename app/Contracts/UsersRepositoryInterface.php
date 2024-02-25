@@ -17,9 +17,7 @@ interface UsersRepositoryInterface
 
     public function update(int $userId, UsersDTO $usersDTO): ?User;
 
-    public function delete(int $userId);
-
-    public function getOrganizationUsers(int $organizationId): Collection;
+    public function getOrganizationUsers(int $organizationId);
 
     public function getByEmail(string $email);
 

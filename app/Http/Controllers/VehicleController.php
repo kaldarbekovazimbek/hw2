@@ -11,33 +11,38 @@ use App\Http\Resources\Vehicle\VehicleCollection;
 use App\Http\Resources\Vehicle\VehicleResource;
 use App\Models\Vehicle;
 use App\Services\Vehicle\CreateVehicleService;
+use App\Services\Vehicle\DeleteVehicleService;
+use App\Services\Vehicle\GetAllVehiclesService;
+use App\Services\Vehicle\GetByIdVehicleService;
+use App\Services\Vehicle\GetOrganizationVehiclesService;
 use App\Services\Vehicle\UpdateVehicleService;
+use Illuminate\Http\JsonResponse;
 
 
 class VehicleController extends Controller
 {
-    private VehicleRepositoryInterface $vehicleRepository;
-    private CreateVehicleService $createVehicleService;
-    private UpdateVehicleService $updateVehicleService;
+
 
     public function __construct(
-        VehicleRepositoryInterface $vehicleRepository,
-        CreateVehicleService       $createVehicleService,
-        UpdateVehicleService       $updateVehicleService
+        private CreateVehicleService           $createVehicleService,
+        private UpdateVehicleService           $updateVehicleService,
+        private GetAllVehiclesService          $GetAllVehicleService,
+        private GetByIdVehicleService          $getByIdVehicleService,
+        private DeleteVehicleService           $deleteVehicleService,
+        private GetOrganizationVehiclesService $getOrganizationVehiclesService,
     )
     {
-        $this->vehicleRepository = $vehicleRepository;
-        $this->createVehicleService = $createVehicleService;
-        $this->updateVehicleService = $updateVehicleService;
     }
 
     /**
      * Display a listing of the resource.
+     * @throws NotFoundException
      */
-    public function index(): VehicleCollection
+    public
+    function index(): VehicleCollection
     {
 
-        $vehicle = $this->vehicleRepository->getAll();
+        $vehicle = $this->GetAllVehicleService->getAllVehicles();
 
         return new VehicleCollection($vehicle);
 
@@ -47,7 +52,8 @@ class VehicleController extends Controller
      * Store a newly created resource in storage.
      * @throws DuplicateException
      */
-    public function store(VehicleRequest $request): VehicleResource
+    public
+    function store(VehicleRequest $request): VehicleResource
     {
         /**
          * @var Vehicle $vehicle
@@ -59,9 +65,13 @@ class VehicleController extends Controller
         return new VehicleResource($vehicle);
     }
 
-    public function show(int $vehicleId): VehicleResource
+    /**
+     * @throws NotFoundException
+     */
+    public
+    function show(int $vehicleId): VehicleResource
     {
-        $vehicle = $this->vehicleRepository->getById($vehicleId);
+        $vehicle = $this->getByIdVehicleService->getVehiclesById($vehicleId);
 
         return new VehicleResource($vehicle);
 
@@ -72,7 +82,8 @@ class VehicleController extends Controller
      * @throws DuplicateException
      * @throws NotFoundException
      */
-    public function update(VehicleRequest $request, int $vehicleId): VehicleResource
+    public
+    function update(VehicleRequest $request, int $vehicleId): VehicleResource
     {
 
         $validatedData = $request->validated();
@@ -84,16 +95,27 @@ class VehicleController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @throws NotFoundException
      */
-    public function destroy(int $vehicleId)
+    public
+    function destroy(int $vehicleId): JsonResponse
     {
-        return $this->vehicleRepository->delete($vehicleId);
+        $vehicle = $this->deleteVehicleService->deleteVehiclesById($vehicleId);
 
+        $vehicle->delete();
+
+        return response()->json([
+            'message'=>__('messages.object_deleted'),
+        ]);
     }
 
-    public function getOrganizationVehicles(int $organizationId): VehicleCollection
+    /**
+     * @throws NotFoundException
+     */
+    public
+    function getOrganizationVehicles(int $organizationId): VehicleCollection
     {
-        $organizationVehicles = $this->vehicleRepository->getOrganizationVehicles($organizationId);
+        $organizationVehicles = $this->getOrganizationVehiclesService->organizationVehicles($organizationId);
 
         return new VehicleCollection($organizationVehicles);
     }

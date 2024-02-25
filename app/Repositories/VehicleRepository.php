@@ -14,27 +14,20 @@ class VehicleRepository implements VehicleRepositoryInterface
 {
     public function getAll(): Collection
     {
-        $vehicle = Vehicle::all();
-
-        return $vehicle;
+        return Vehicle::all();
     }
 
-    /**
-     * @throws NotFoundException
-     */
     public function getById(int $vehicleId): ?Vehicle
     {
         /**
          * @var Vehicle|null $vehicle
          */
         $vehicle = Vehicle::query()->find($vehicleId);
-        if ($vehicle === null) {
-            throw new NotFoundException(__('messages.object_not_found'),404);
-        }
+
         return $vehicle;
     }
 
-    public function create(VehicleDTO $vehicleDTO): Vehicle
+    public function createVehicle(VehicleDTO $vehicleDTO): Vehicle
     {
         $vehicle = new Vehicle();
         $vehicle->model = $vehicleDTO->getModel();
@@ -45,10 +38,7 @@ class VehicleRepository implements VehicleRepositoryInterface
         return $vehicle;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function update(int $vehicleId, VehicleDTO $vehicleDTO): ?Vehicle
+    public function updateVehicle(int $vehicleId, VehicleDTO $vehicleDTO): ?Vehicle
     {
         $vehicle = $this->getById($vehicleId);
         $vehicle->model = $vehicleDTO->getModel();
@@ -58,21 +48,6 @@ class VehicleRepository implements VehicleRepositoryInterface
         return $vehicle;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function delete(int $vehicleId): JsonResponse
-    {
-        $vehicle = $this->getById($vehicleId);
-        if ($vehicle === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-        $vehicle->delete();
-
-        return response()->json([
-            'message' => __('messages.object_deleted')
-        ]);
-    }
 
     public function getVehicleByNumber(int $serialNumber): ?Vehicle
     {
@@ -84,21 +59,19 @@ class VehicleRepository implements VehicleRepositoryInterface
         return $vehicle;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function getOrganizationVehicles(int $organizationId): Collection
+    public function getOrganizationVehicles(int $organizationId): ?Organization
     {
+
         /**
          * @var Organization $organization
          */
-
         $organization = Organization::query()->find($organizationId);
 
-        if ($organization === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
+        if (!$organization){
+            return  null;
         }
-        return $organization->vehicles()->get();
+        return $organization;
+
     }
 
 }

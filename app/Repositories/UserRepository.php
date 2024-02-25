@@ -13,33 +13,17 @@ use Illuminate\Http\JsonResponse;
 class UserRepository implements UsersRepositoryInterface
 {
 
-    /**
-     * @throws NotFoundException
-     */
     public function getAll(): Collection
     {
-
-        $users = User::all();
-
-        if ($users === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-        return $users;
+        return User::all();
     }
 
-    /**
-     * @throws NotFoundException
-     */
     public function getById(int $userId): ?User
     {
         /**
          * @var User|null $user
          */
         $user = User::query()->find($userId);
-
-        if ($user === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
 
         return $user;
     }
@@ -57,9 +41,6 @@ class UserRepository implements UsersRepositoryInterface
         return $user;
     }
 
-    /**
-     * @throws NotFoundException
-     */
     public function update(int $userId, UsersDTO $usersDTO): ?User
     {
         $user = $this->getById($userId);
@@ -72,45 +53,24 @@ class UserRepository implements UsersRepositoryInterface
         return $user;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function delete(int $userId): JsonResponse
-    {
-        $user = $this->getById($userId);
-
-        if ($user === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-        $user->delete();
-        return response()->json([
-            'message' => __('messages.object_deleted')
-        ]);
-    }
-
     public function getByEmail(string $email): ?User
     {
         /**
          * @var User|null $user
-         * @var
          */
         $user = User::query()->where('email', '=', $email)->first();
 
         return $user;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function getOrganizationUsers(int $organizationId): Collection
+
+    public function getOrganizationUsers(int $organizationId): Organization
     {
-        $organization = Organization::query()->find($organizationId);
-        if ($organization === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
         /**
          * @var Organization $organization
          */
-        return $organization->users()->get();
+        $organization = Organization::query()->find($organizationId);
+
+        return $organization;
     }
 }

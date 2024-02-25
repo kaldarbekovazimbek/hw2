@@ -5,33 +5,41 @@ namespace App\Http\Controllers;
 use App\Contracts\FuelSensorRepositoryInterface;
 use App\DTO\FuelSensorDTO;
 use App\Exceptions\DuplicateException;
+use App\Exceptions\NotFoundException;
 use App\Http\Requests\FuelSensorRequest;
 use App\Http\Resources\FuelSensor\FuelSensorCollection;
 use App\Http\Resources\FuelSensor\FuelSensorResource;
 use App\Services\FuelSensor\CreateFuelSensorService;
+use App\Services\FuelSensor\DeleteFuelSensorService;
+use App\Services\FuelSensor\GetAllFuelSensorsService;
+use App\Services\FuelSensor\GetByIdFuelSensorService;
+use App\Services\FuelSensor\GetVehicleFuelSensorsService;
 use App\Services\FuelSensor\UpdateFuelSensorService;
 use Illuminate\Http\JsonResponse;
 
 class FuelSensorController extends Controller
 {
-    private FuelSensorRepositoryInterface $fuelSensorRepository;
-    private CreateFuelSensorService $createFuelSensorService;
-    private UpdateFuelSensorService $updateFuelSensorService;
 
     public function __construct(
-        FuelSensorRepositoryInterface $fuelSensorRepository,
-        CreateFuelSensorService       $createFuelSensorService,
-        UpdateFuelSensorService       $updateFuelSensorService
+
+        private GetAllFuelSensorsService      $allFuelSensorsService,
+        private GetByIdFuelSensorService      $getByIdFuelSensorService,
+        private DeleteFuelSensorService       $deleteFuelSensorService,
+        private GetVehicleFuelSensorsService  $getVehicleFuelSensorsService,
+        private CreateFuelSensorService       $createFuelSensorService,
+        private UpdateFuelSensorService       $updateFuelSensorService,
+
     )
     {
-        $this->createFuelSensorService = $createFuelSensorService;
-        $this->fuelSensorRepository = $fuelSensorRepository;
-        $this->updateFuelSensorService = $updateFuelSensorService;
     }
 
-    public function index(): FuelSensorCollection
+    /**
+     * @throws NotFoundException
+     */
+    public
+    function index(): FuelSensorCollection
     {
-        $fuelSensors = $this->fuelSensorRepository->getAll();
+        $fuelSensors = $this->allFuelSensorsService->getAllFuelSensors();
 
         return new FuelSensorCollection($fuelSensors);
 
@@ -41,7 +49,8 @@ class FuelSensorController extends Controller
      * Store a newly created resource in storage.
      * @throws DuplicateException
      */
-    public function store(FuelSensorRequest $request): FuelSensorResource
+    public
+    function store(FuelSensorRequest $request): FuelSensorResource
     {
         $validatedData = $request->validated();
 
@@ -51,9 +60,13 @@ class FuelSensorController extends Controller
     }
 
 
-    public function show(int $fuelSensorId): FuelSensorResource
+    /**
+     * @throws NotFoundException
+     */
+    public
+    function show(int $fuelSensorId): FuelSensorResource
     {
-        $fuelSensor = $this->fuelSensorRepository->getById($fuelSensorId);
+        $fuelSensor = $this->getByIdFuelSensorService->getById($fuelSensorId);
 
         return new FuelSensorResource($fuelSensor);
     }
@@ -61,7 +74,8 @@ class FuelSensorController extends Controller
     /**
      * @throws DuplicateException
      */
-    public function update(FuelSensorRequest $request, int $fuelSensorId): FuelSensorResource
+    public
+    function update(FuelSensorRequest $request, int $fuelSensorId): FuelSensorResource
     {
 
         $validatedData = $request->validated();
@@ -71,15 +85,28 @@ class FuelSensorController extends Controller
         return new FuelSensorResource($fuelSensor);
     }
 
-    public function destroy(int $fuelSensorId): JsonResponse
+    /**
+     * @throws NotFoundException
+     */
+    public
+    function destroy(int $fuelSensorId): JsonResponse
     {
-       return $this->fuelSensorRepository->delete($fuelSensorId);
+        $fuelSensor = $this->deleteFuelSensorService->deleteFuelSensor($fuelSensorId);
 
+        $fuelSensor->delete();
+
+        return response()->json([
+            'message' => 'Object was deleted'
+        ]);
     }
 
-    public function getVehicleSensors(int $vehicleId): FuelSensorCollection
+    /**
+     * @throws NotFoundException
+     */
+    public
+    function getVehicleSensors(int $vehicleId): FuelSensorCollection
     {
-        $vehicleSensors = $this->fuelSensorRepository->getVehicleSensors($vehicleId);
+        $vehicleSensors = $this->getVehicleFuelSensorsService->getVehicleFuelSensors($vehicleId);
 
         return new FuelSensorCollection($vehicleSensors);
     }

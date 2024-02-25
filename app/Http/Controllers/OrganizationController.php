@@ -2,36 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\OrganizationRepositoryInterface;
 use App\DTO\OrganizationDTO;
 use App\Exceptions\DuplicateException;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\OrganizationRequest;
 use App\Http\Resources\Organization\OrganizationCollection;
 use App\Http\Resources\Organization\OrganizationResource;
-use App\Repositories\OrganizationRepository;
+use App\Services\FuelSensor\GetByIdFuelSensorService;
 use App\Services\Organization\CreateOrganizationService;
+use App\Services\Organization\DeleteOrganizationService;
+use App\Services\Organization\GetAllOrganizationService;
+use App\Services\Organization\GetByIdOrganizationService;
 use App\Services\Organization\UpdateOrganizationService;
 use Illuminate\Http\JsonResponse;
 
 class OrganizationController extends Controller
 {
-    private CreateOrganizationService $createOrganizationService;
-    private UpdateOrganizationService $updateOrganizationService;
-    private OrganizationRepository $organizationRepository;
-public function __construct(CreateOrganizationService $createOrganizationService, UpdateOrganizationService $updateOrganizationService, OrganizationRepository $repository)
-{
-    $this->createOrganizationService = $createOrganizationService;
-    $this->updateOrganizationService = $updateOrganizationService;
-    $this->organizationRepository = $repository;
-}
+
+    public function __construct(
+        private OrganizationRepositoryInterface $organizationRepository,
+        private GetAllOrganizationService $getAllOrganizationService,
+        private GetByIdOrganizationService $getByIdOrganizationService,
+        private CreateOrganizationService $createOrganizationService,
+        private UpdateOrganizationService $updateOrganizationService,
+        private DeleteOrganizationService $deleteOrganizationService,
+    )
+    {
+    }
 
     /**
      * Display a listing of the resource.
      * @throws NotFoundException
      */
-    public function index(): OrganizationCollection
+    public
+    function index(): OrganizationCollection
     {
-        $organizations = $this->organizationRepository->getAll();
+        $organizations = $this->getAllOrganizationService->getAllOrganizations();
 
         return new OrganizationCollection($organizations);
     }
@@ -40,7 +47,8 @@ public function __construct(CreateOrganizationService $createOrganizationService
      * Store a newly created resource in storage.
      * @throws DuplicateException
      */
-    public function store(OrganizationRequest $request): OrganizationResource
+    public
+    function store(OrganizationRequest $request): OrganizationResource
     {
         $validatedData = $request->validated();
 
@@ -53,18 +61,21 @@ public function __construct(CreateOrganizationService $createOrganizationService
     /**
      * @throws NotFoundException
      */
-    public function show(int $organizationId): OrganizationResource|JsonResponse
+    public
+    function show(int $organizationId): OrganizationResource|JsonResponse
     {
-        $organization = $this->organizationRepository->getById($organizationId);
 
+        $organization = $this->getByIdOrganizationService->getOrganization($organizationId);
         return new OrganizationResource($organization);
+
     }
 
     /**
      * Update the specified resource in storage.
      * @throws NotFoundException
      */
-    public function update(OrganizationRequest $request, int $organizationId): OrganizationResource|JsonResponse
+    public
+    function update(OrganizationRequest $request, int $organizationId): OrganizationResource|JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -76,8 +87,14 @@ public function __construct(CreateOrganizationService $createOrganizationService
     /**
      * @throws NotFoundException
      */
-    public function destroy(int $organizationId): JsonResponse
+    public
+    function destroy(int $organizationId): JsonResponse
     {
-        return $this->organizationRepository->delete($organizationId);
+        $organization = $this->deleteOrganizationService->deleteOrganization($organizationId);
+        $organization->delete();
+
+        return response()->json([
+            'message'=>__('messages.object_deleted'),
+        ]);
     }
 }

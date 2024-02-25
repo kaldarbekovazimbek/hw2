@@ -4,5 +4,5 @@ return [
     'object_with_serial_number_exists'=>'Object with this number already exists',
     'object_with_email_exists'=>'Object with this email already exists',
     'object_with_number_exists'=>'Object with this number already exists',
-    'object_deleted'=>'Object deleted'
+    'object_deleted'=>'Object deleted successfully'
 ];

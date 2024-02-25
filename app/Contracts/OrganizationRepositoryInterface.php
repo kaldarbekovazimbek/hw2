@@ -16,7 +16,5 @@ interface OrganizationRepositoryInterface
 
     public function update(int $organizationId, OrganizationDTO $organizationDTO):?Organization;
 
-    public function delete(int $organizationId);
-
     public function getByPhone(string $phone): ?Organization;
 }

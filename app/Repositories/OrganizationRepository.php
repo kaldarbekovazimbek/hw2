@@ -4,26 +4,14 @@ namespace App\Repositories;
 
 use App\Contracts\OrganizationRepositoryInterface;
 use App\DTO\OrganizationDTO;
-use App\Exceptions\NotFoundException;
 use App\Models\Organization;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\JsonResponse;
 
 class OrganizationRepository implements OrganizationRepositoryInterface
 {
-
-    /**
-     * @throws NotFoundException
-     */
     public function getAll(): Collection
     {
-        $organizations = Organization::all();
-
-        if ($organizations === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-
-        return $organizations;
+        return Organization::all();
     }
 
     public function getById(int $organizationId): ?Organization
@@ -32,9 +20,7 @@ class OrganizationRepository implements OrganizationRepositoryInterface
          * @var Organization $organization
          */
         $organization = Organization::query()->find($organizationId);
-        if ($organization === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
+
         return $organization;
     }
 
@@ -49,9 +35,7 @@ class OrganizationRepository implements OrganizationRepositoryInterface
         return $organization;
     }
 
-    /**
-     * @throws NotFoundException
-     */
+
     public function update(int $organizationId, OrganizationDTO $organizationDTO): ?Organization
     {
 
@@ -62,23 +46,6 @@ class OrganizationRepository implements OrganizationRepositoryInterface
         $organization->save();
 
         return $organization;
-    }
-
-    /**
-     * @throws NotFoundException
-     */
-    public function delete(int $organizationId): JsonResponse
-    {
-        $organization = Organization::query()->find($organizationId);
-        if ($organization === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-        $organization->delete();
-
-        return response()->json([
-            'message' =>__('messages.object_deleted')
-        ]);
-
     }
 
     public function getByPhone(string $phone): ?Organization

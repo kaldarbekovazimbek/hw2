@@ -29,7 +29,7 @@ class UpdateVehicleService
         if ($existingVehicle !== null && $existingVehicle->id != $vehicleId) {
             throw new DuplicateException(__('messages.object_with_serial_number_exists'), 409);
         }
-        return $this->vehicleRepository->update($vehicleId, $vehicleDTO);
+        return $this->vehicleRepository->updateVehicle($vehicleId, $vehicleDTO);
 
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +16,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+   $users = User::all();
+    Cache::put('users', $users, 120);
+    return $users;
+});
+Route::get('/{id}', function ($id) {
+    Cache::get('users', 'empty');
 });

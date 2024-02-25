@@ -19,10 +19,6 @@ class FuelSensorRepository implements FuelSensorRepositoryInterface
     {
         $fuelSensors = FuelSensor::all();
 
-        if ($fuelSensors === null){
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-
         return $fuelSensors;
 
     }
@@ -37,7 +33,7 @@ class FuelSensorRepository implements FuelSensorRepositoryInterface
          */
         $fuelSensor = FuelSensor::query()->find($sensorId);
 
-        if ($fuelSensor === null){
+        if ($fuelSensor === null) {
             throw new NotFoundException(__('messages.object_not_found'), 404);
         }
 
@@ -70,23 +66,6 @@ class FuelSensorRepository implements FuelSensorRepositoryInterface
         return $fuelSensor;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function delete(int $sensorId): JsonResponse
-    {
-        $fuelSensor = $this->getById($sensorId);
-        if ($fuelSensor === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
-        $fuelSensor->delete();
-
-        return response()->json([
-            'message' => __('messages.object_deleted')
-        ]);
-
-    }
-
     public function getFuelSensorBySerialNumber(int $serialNumber): ?FuelSensor
     {
         /**
@@ -96,22 +75,15 @@ class FuelSensorRepository implements FuelSensorRepositoryInterface
         return $fuelSensor;
     }
 
-    /**
-     * @throws NotFoundException
-     */
-    public function getVehicleSensors(int $vehicleId): Collection
+    public function getVehicleSensors(int $vehicleId): ?Vehicle
     {
-        $vehicle = Vehicle::query()->find($vehicleId);
-        if ($vehicle === null) {
-            throw new NotFoundException(__('messages.object_not_found'), 404);
-        }
         /**
          * @var Vehicle $vehicle
          */
-        $fuelSensor = $vehicle->fuelSensors()->get();
-        if ($fuelSensor === null){
-            throw new NotFoundException(__('messages.object_not_found'), 404);
+        $vehicle = Vehicle::query()->find($vehicleId);
+        if (!$vehicle) {
+            return null;
         }
-        return $fuelSensor;
+        return $vehicle;
     }
 }

@@ -26,7 +26,7 @@ class CreateVehicleService
         if ($vehicle !== null) {
             throw new DuplicateException(__('messages.object_with_serial_number_exists'), 409);
         }
-        return $this->vehicleRepository->create($vehicleDTO);
+        return $this->vehicleRepository->createVehicle($vehicleDTO);
     }
 
 }

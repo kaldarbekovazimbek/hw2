@@ -21,8 +21,8 @@ class CreateFuelSensorService
      */
     public function createFuelSensor(FuelSensorDTO $fuelSensorDTO): FuelSensor
     {
-        $sensorNumber = $this->fuelSensorRepository->getFuelSensorBySerialNumber($fuelSensorDTO->getSerialNumber());
-        if ($sensorNumber) {
+        $existingSensorNumber = $this->fuelSensorRepository->getFuelSensorBySerialNumber($fuelSensorDTO->getSerialNumber());
+        if ($existingSensorNumber !==null) {
             throw new DuplicateException(__('messages.object_with_serial_number_exists'), 409);
         }
 

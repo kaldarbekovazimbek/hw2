@@ -21,10 +21,10 @@ class CreateUserService
      */
     public function createUser(UsersDTO $usersDTO): ?User
     {
-        $usersPhone = $this->usersRepository->getByPhone($usersDTO->getPhone());
-        $usersEmail = $this->usersRepository->getByEmail($usersDTO->getEmail());
 
-        if ($usersPhone !== null or $usersEmail !== null){
+        $existingUsersEmail = $this->usersRepository->getByEmail($usersDTO->getEmail());
+
+        if ($existingUsersEmail !== null){
             throw new DuplicateException('messages.object_with_number_or_email_exists', 409);
         }
 

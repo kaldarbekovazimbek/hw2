@@ -16,9 +16,7 @@ interface FuelSensorRepositoryInterface
 
     public function update(int $sensorId, FuelSensorDTO $fuelSensorDTO): FuelSensor;
 
-    public function delete(int $sensorId);
-
     public function getFuelSensorBySerialNumber(int $serialNumber);
 
-    public function getVehicleSensors(int $vehicleId): Collection;
+    public function getVehicleSensors(int $vehicleId);
 }
