@@ -20,6 +20,4 @@ Route::get('/', function () {
     Cache::put('users', $users, 120);
     return $users;
 });
-Route::get('/{id}', function ($id) {
-    Cache::get('users', 'empty');
-});
+Route::get('/mail-send', [\App\Http\Controllers\MailController::class, 'index']);
