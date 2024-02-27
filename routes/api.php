@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\FuelSensorController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\AuthUserController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
@@ -16,8 +18,12 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::post('/register', [AuthUserController::class, 'register']);
+Route::post('/login', [AuthUserController::class, 'login']);
+Route::post('/logout', [AuthUserController::class, 'logout']);
 
-Route::middleware('check.token')->group(function (){
+Route::middleware('check.token')->middleware('auth:sanctum')->group(function () {
+
     Route::get('/organizations', [OrganizationController::class, 'index'])->name('organization.index');
     Route::post('/organizations', [OrganizationController::class, 'store'])->name('organization.store');
     Route::get('/organizations/{organizationId}', [OrganizationController::class, 'show'])->name('organization.show');
@@ -34,16 +40,18 @@ Route::middleware('check.token')->group(function (){
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
     Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
     Route::get('/vehicles/{vehicleId}', [VehicleController::class, 'show'])->name('vehicles.show');
-    Route::match(['put','patch'],'/vehicles/{vehicleId}', [VehicleController::class, 'update'])->name('vehicles.update');
+    Route::match(['put', 'patch'], '/vehicles/{vehicleId}', [VehicleController::class, 'update'])->name('vehicles.update');
     Route::delete('/vehicles/{vehicleId}', [VehicleController::class, 'destroy'])->name('vehicles.update');
     Route::get('/organizations/{organizationId}/vehicles', [VehicleController::class, 'getOrganizationVehicles'])->name('vehicles.getOrganizationVehicles');
 
     Route::get('/sensors', [FuelSensorController::class, 'index'])->name('sensors.index');
     Route::post('/sensors', [FuelSensorController::class, 'store'])->name('sensors.store');
     Route::get('/sensors/{sensorId}', [FuelSensorController::class, 'show'])->name('sensors.show');
-    Route::match(['put','patch'],'/sensors/{sensorId}', [FuelSensorController::class, 'update'])->name('sensors.update');
+    Route::match(['put', 'patch'], '/sensors/{sensorId}', [FuelSensorController::class, 'update'])->name('sensors.update');
     Route::delete('/sensors/{sensorId}', [FuelSensorController::class, 'destroy'])->name('sensors.update');
     Route::get('/vehicles/{vehiclesId}/sensors', [FuelSensorController::class, 'getVehicleSensors'])->name('sensors.getVehicleSensors');
 
 });
+
+
 

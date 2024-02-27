@@ -9,7 +9,6 @@ use App\Exceptions\NotFoundException;
 use App\Http\Requests\OrganizationRequest;
 use App\Http\Resources\Organization\OrganizationCollection;
 use App\Http\Resources\Organization\OrganizationResource;
-use App\Services\FuelSensor\GetByIdFuelSensorService;
 use App\Services\Organization\CreateOrganizationService;
 use App\Services\Organization\DeleteOrganizationService;
 use App\Services\Organization\GetAllOrganizationService;

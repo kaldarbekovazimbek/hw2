@@ -10,6 +10,7 @@ use App\Exceptions\NotFoundException;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\User\UserCollection;
 use App\Http\Resources\User\UserResource;
+use App\Jobs\UserSendMail;
 use App\Services\User\CreateUserService;
 use App\Services\User\DeleteUserService;
 use App\Services\User\GetAllUserService;
@@ -54,8 +55,9 @@ class UserController extends Controller
 
         $user = $this->createUserService->createUser(UsersDTO::fromArray($validatedData));
 
-        return new UserResource($user);
+        UserSendMail::dispatch($user);
 
+        return new UserResource($user);
     }
 
     /**

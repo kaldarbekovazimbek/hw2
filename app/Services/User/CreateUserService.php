@@ -25,7 +25,7 @@ class CreateUserService
         $existingUsersEmail = $this->usersRepository->getByEmail($usersDTO->getEmail());
 
         if ($existingUsersEmail !== null){
-            throw new DuplicateException('messages.object_with_number_or_email_exists', 409);
+            throw new DuplicateException(__('messages.object_with_email_exists'), 409);
         }
 
         return $this->usersRepository->create($usersDTO);

@@ -48,6 +48,7 @@ class UsersDTO
             email: $data['email'],
             password: $data['password'],
 
+
         );
     }
 

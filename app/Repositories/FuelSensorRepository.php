@@ -12,14 +12,10 @@ use Illuminate\Http\JsonResponse;
 
 class FuelSensorRepository implements FuelSensorRepositoryInterface
 {
-    /**
-     * @throws NotFoundException
-     */
+
     public function getAll(): Collection
     {
-        $fuelSensors = FuelSensor::all();
-
-        return $fuelSensors;
+        return FuelSensor::all();
 
     }
 
