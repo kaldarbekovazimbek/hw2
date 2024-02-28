@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('/register', [AuthUserController::class, 'register']);
 Route::post('/login', [AuthUserController::class, 'login']);
-Route::post('/logout', [AuthUserController::class, 'logout']);
+Route::post('/logout', [AuthUserController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('check.token')->middleware('auth:sanctum')->group(function () {
 

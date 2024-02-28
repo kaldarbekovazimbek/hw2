@@ -20,46 +20,44 @@ use Illuminate\Support\Facades\Hash;
 class AuthUserController extends Controller
 {
 
-    public function __construct(private CreateUserService $createUserService,)
-    {
-    }
+//    public function __construct(private CreateUserService $createUserService,)
+//    {
+//    }
 
     /**
      * @throws DuplicateException
      */
-    public function register(UserRequest $request): JsonResponse
+    public function register(UserRequest $request): UserResource
     {
         /**
          * @var User $validatedData
          */
         $validatedData = $request->validated();
 
-        $user = $this->createUserService->createUser(UsersDTO::fromArray($validatedData));
-//
-//        $user = User::query()->where('email', $validatedData['email']);
-//        if ($user === null){
-//            throw new DuplicateException(__('messages.object_with_email_exists'), 409);
-//        }
 
-        $token = $user->createToken('app-token')->plainTextToken;
-        return response()->json([
-            'token'=>$token
-        ]);
+        $user = User::query()->where('email', $validatedData['email'])->first();
+
+        if ($user !== null){
+            throw new DuplicateException(__('messages.object_with_email_exists'), 409);
+        }
+        $user = User::query()->create($validatedData);
+
+        return new UserResource($user);
     }
 
     /**
      * @throws BadCredentialsException
      */
-    public function login(UserLoginRequest $request)
+    public function login(UserLoginRequest $request): JsonResponse
     {
         /**
          * @var User $user
          */
         $validatedData = $request->validated();
 
-        $user = User::query()->where('email', $validatedData->email)->first();
+        $user = User::query()->where('email', $validatedData['email'])->first();
 
-        if (!$user || !Hash::check($validatedData->password, $user->password)) {
+        if (!$user || !Hash::check($validatedData['password'], $user->password)) {
             throw new BadCredentialsException(__('messages.bad_credentials'));
         }
 
@@ -70,13 +68,14 @@ class AuthUserController extends Controller
         ]);
     }
 
-    public function logout(UserRequest $request)
+    public function logout(): JsonResponse
     {
+
         auth()->user()->tokens()->delete();
 
-        return [
-            'message' => 'Logged out'
-        ];
+        return response()->json([
+            "message"=>"logged out"
+        ]);
     }
 
 }
