@@ -7,13 +7,11 @@ use App\Exceptions\ExistsObjectException;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRequest;
 use App\Jobs\SendConfirmationCodeJob;
-use App\Mail\SendConfirmationCodeMail;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 
 class AuthUserController extends Controller
 {
@@ -40,7 +38,6 @@ class AuthUserController extends Controller
         Cache::put('confirmation_code_' . $user->email, $confirmationCode, 60*5);
 
         SendConfirmationCodeJob::dispatch($user['email'], $confirmationCode);
-//      Mail::to($user->email)->send(new SendConfirmationCodeMail($confirmationCode));
         return \response()->json([
             'message'=>'Code send to user mail',
         ]);
