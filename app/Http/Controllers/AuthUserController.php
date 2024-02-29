@@ -25,9 +25,9 @@ class AuthUserController extends Controller
     public function register(UserRequest $request): JsonResponse
     {
 
-        $user = User::query()->where('email', $request->email)->first();
+        $userExisting = User::query()->where('email', $request->email)->first();
 
-        if ($user !== null) {
+        if ($userExisting !== null) {
             throw new ExistsObjectException('User already exists', 409);
         }
 
@@ -39,8 +39,8 @@ class AuthUserController extends Controller
 
         Cache::put('confirmation_code_' . $user->email, $confirmationCode, 60*5);
 
-        SendConfirmationCodeJob::dispatch($user->email, $confirmationCode);
-//        Mail::to($user->email)->send(new SendConfirmationCodeMail($confirmationCode));
+        SendConfirmationCodeJob::dispatch($user['email'], $confirmationCode);
+//      Mail::to($user->email)->send(new SendConfirmationCodeMail($confirmationCode));
         return \response()->json([
             'message'=>'Code send to user mail',
         ]);
