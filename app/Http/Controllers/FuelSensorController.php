@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\FuelSensorRepositoryInterface;
 use App\DTO\FuelSensorDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\FuelSensorRequest;
 use App\Http\Resources\FuelSensor\FuelSensorCollection;
@@ -47,7 +47,7 @@ class FuelSensorController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public
     function store(FuelSensorRequest $request): FuelSensorResource
@@ -72,7 +72,7 @@ class FuelSensorController extends Controller
     }
 
     /**
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public
     function update(FuelSensorRequest $request, int $fuelSensorId): FuelSensorResource

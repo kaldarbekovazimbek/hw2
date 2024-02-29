@@ -4,7 +4,7 @@ namespace App\Services\Organization;
 
 use App\Contracts\OrganizationRepositoryInterface;
 use App\DTO\OrganizationDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Models\Organization;
 

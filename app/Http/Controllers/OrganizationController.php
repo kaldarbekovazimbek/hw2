@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\OrganizationRepositoryInterface;
 use App\DTO\OrganizationDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\OrganizationRequest;
 use App\Http\Resources\Organization\OrganizationCollection;
@@ -20,7 +20,6 @@ class OrganizationController extends Controller
 {
 
     public function __construct(
-        private OrganizationRepositoryInterface $organizationRepository,
         private GetAllOrganizationService $getAllOrganizationService,
         private GetByIdOrganizationService $getByIdOrganizationService,
         private CreateOrganizationService $createOrganizationService,
@@ -44,7 +43,7 @@ class OrganizationController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public
     function store(OrganizationRequest $request): OrganizationResource

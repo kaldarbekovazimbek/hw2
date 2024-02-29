@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\VehicleRepositoryInterface;
 use App\DTO\VehicleDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\VehicleRequest;
 use App\Http\Resources\Vehicle\VehicleCollection;
@@ -50,7 +50,7 @@ class VehicleController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public
     function store(VehicleRequest $request): VehicleResource
@@ -79,7 +79,7 @@ class VehicleController extends Controller
 
 
     /**
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      * @throws NotFoundException
      */
     public

@@ -16,13 +16,3 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-   $users = User::all();
-    Cache::put('users', $users, 120);
-    return $users;
-});
-Route::get('/mail-send', [\App\Http\Controllers\MailController::class, 'index']);
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

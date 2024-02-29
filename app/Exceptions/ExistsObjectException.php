@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
-class DuplicateException extends Exception
+class ExistsObjectException extends Exception
 {
     public function render(): JsonResponse
     {

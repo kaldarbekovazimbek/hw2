@@ -2,47 +2,68 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\UsersDTO;
 use App\Exceptions\BadCredentialsException;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\User\UserResource;
+use App\Mail\SendConfirmationCodeMail;
 use App\Models\User;
-use App\Services\User\CreateUserService;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthUserController extends Controller
 {
 
-//    public function __construct(private CreateUserService $createUserService,)
-//    {
-//    }
 
     /**
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
-    public function register(UserRequest $request): UserResource
+    public function register(UserRequest $request): JsonResponse
     {
-        /**
-         * @var User $validatedData
-         */
-        $validatedData = $request->validated();
 
+        $user = User::query()->where('email', $request->email)->first();
 
-        $user = User::query()->where('email', $validatedData['email'])->first();
-
-        if ($user !== null){
-            throw new DuplicateException(__('messages.object_with_email_exists'), 409);
+        if ($user !== null) {
+            throw new ExistsObjectException('User already exists', 409);
         }
-        $user = User::query()->create($validatedData);
 
-        return new UserResource($user);
+        $validData = $request->validated();
+
+        $user = User::query()->create($validData);
+
+        $confirmationCode = rand(10000, 99999);
+
+        Cache::put('confirmation_code_' . $user->email, $confirmationCode, now()->addMinute(10));
+
+//        SendConfirmationCodeJob::dispatch($user, $confirmationCode);
+        Mail::to($user->email)->send(new SendConfirmationCodeMail($confirmationCode));
+        return \response()->json([
+            'message'=>'Code send to user mail',
+        ]);
+    }
+
+    public function confirmationEmail(Request $request): JsonResponse
+    {
+        $email = $request->input('email');
+        $confirmationCode = $request->input('confirmation_code');
+
+        $cachedConfirmationCode = Cache::get('confirmation_code_' . $email);
+        if ($cachedConfirmationCode != $confirmationCode) {
+            return \response()->json([
+                'message' => 'Invalid confirmation code'
+            ], 403);
+        }
+
+        Cache::forget('confirmation_code' . $email);
+        $user = User::query()->where('email', $email)->first();
+        $user['email_verified_at'] = now();
+        $user->save();
+        return response()->json([
+            'message' => 'Email verified',
+        ]);
     }
 
     /**
@@ -53,6 +74,7 @@ class AuthUserController extends Controller
         /**
          * @var User $user
          */
+
         $validatedData = $request->validated();
 
         $user = User::query()->where('email', $validatedData['email'])->first();
@@ -64,7 +86,7 @@ class AuthUserController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'token'=>$token
+            'token' => $token
         ]);
     }
 
@@ -74,7 +96,7 @@ class AuthUserController extends Controller
         auth()->user()->tokens()->delete();
 
         return response()->json([
-            "message"=>"logged out"
+            "message" => "logged out"
         ]);
     }
 

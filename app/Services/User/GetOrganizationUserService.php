@@ -4,7 +4,7 @@ namespace App\Services\User;
 
 use App\Contracts\UsersRepositoryInterface;
 use App\DTO\UsersDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Models\Organization;
 use App\Models\User;

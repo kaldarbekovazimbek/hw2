@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 
 use App\Contracts\UsersRepositoryInterface;
 use App\DTO\UsersDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\User\UserCollection;
 use App\Http\Resources\User\UserResource;
-use App\Jobs\UserSendMail;
 use App\Services\User\CreateUserService;
 use App\Services\User\DeleteUserService;
 use App\Services\User\GetAllUserService;
@@ -47,15 +46,13 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public function store(UserRequest $request): UserResource
     {
         $validatedData = $request->validated();
 
         $user = $this->createUserService->createUser(UsersDTO::fromArray($validatedData));
-
-        UserSendMail::dispatch($user);
 
         return new UserResource($user);
     }
@@ -71,7 +68,7 @@ class UserController extends Controller
     }
 
     /**
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public function update(UserRequest $request, int $userId): UserResource
     {

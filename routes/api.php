@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\FuelSensorController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\AuthUserController;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('/register', [AuthUserController::class, 'register']);
+Route::post('/register/verify', [AuthUserController::class, 'confirmationEmail']);
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/logout', [AuthUserController::class, 'logout'])->middleware('auth:sanctum');
 

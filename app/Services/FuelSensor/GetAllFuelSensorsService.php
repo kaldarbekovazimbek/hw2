@@ -4,7 +4,7 @@ namespace App\Services\FuelSensor;
 
 use App\Contracts\FuelSensorRepositoryInterface;
 use App\DTO\FuelSensorDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Exceptions\NotFoundException;
 use App\Models\FuelSensor;
 

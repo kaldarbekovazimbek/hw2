@@ -4,7 +4,7 @@ namespace App\Services\User;
 
 use App\Contracts\UsersRepositoryInterface;
 use App\DTO\UsersDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Models\User;
 
 class UpdateUserService
@@ -17,7 +17,7 @@ class UpdateUserService
     }
 
     /**
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public function updateUser(int $userId, UsersDTO $usersDTO): ?User
     {
@@ -27,7 +27,7 @@ class UpdateUserService
         $existingUsersEmail = $this->usersRepository->getByEmail($usersDTO->getEmail());
 
         if ($existingUsersEmail !== null && $existingUsersEmail->id !== $userId) {
-            throw new DuplicateException(__('messages.object_with_email_exists', 409));
+            throw new ExistsObjectException(__('messages.object_with_email_exists', 409));
         }
 
         return $this->usersRepository->update($userId, $usersDTO);

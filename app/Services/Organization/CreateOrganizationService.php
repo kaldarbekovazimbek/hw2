@@ -4,7 +4,7 @@ namespace App\Services\Organization;
 
 use App\Contracts\OrganizationRepositoryInterface;
 use App\DTO\OrganizationDTO;
-use App\Exceptions\DuplicateException;
+use App\Exceptions\ExistsObjectException;
 use App\Models\Organization;
 
 class CreateOrganizationService
@@ -17,7 +17,7 @@ class CreateOrganizationService
     }
 
     /**
-     * @throws DuplicateException
+     * @throws ExistsObjectException
      */
     public function creatOrganization(OrganizationDTO $organizationDTO): Organization
     {
@@ -25,7 +25,7 @@ class CreateOrganizationService
 
         if ($organization !== null) {
 
-            throw new DuplicateException(__('messages.object_with_serial_number_exists'), 409);
+            throw new ExistsObjectException(__('messages.object_with_serial_number_exists'), 409);
         }
 
         return $this->organizationRepository->create($organizationDTO);
