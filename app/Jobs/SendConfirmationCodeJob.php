@@ -18,12 +18,12 @@ class SendConfirmationCodeJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    protected User $user;
+    protected string $email;
     protected int $confirmationCode;
 
-    public function __construct(User $user, int $confirmationCode)
+    public function __construct(string $email, int $confirmationCode)
     {
-        $this->user = $user;
+        $this->email = $email;
         $this->confirmationCode = $confirmationCode;
     }
 
@@ -33,6 +33,7 @@ class SendConfirmationCodeJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->user->email)->send(new SendConfirmationCodeMail($this->confirmationCode));
+
+        Mail::to($this->email)->send(new SendConfirmationCodeMail($this->confirmationCode));
     }
 }

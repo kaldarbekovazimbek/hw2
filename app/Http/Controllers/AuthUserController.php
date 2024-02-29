@@ -6,6 +6,7 @@ use App\Exceptions\BadCredentialsException;
 use App\Exceptions\ExistsObjectException;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRequest;
+use App\Jobs\SendConfirmationCodeJob;
 use App\Mail\SendConfirmationCodeMail;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -36,10 +37,10 @@ class AuthUserController extends Controller
 
         $confirmationCode = rand(10000, 99999);
 
-        Cache::put('confirmation_code_' . $user->email, $confirmationCode, now()->addMinute(10));
+        Cache::put('confirmation_code_' . $user->email, $confirmationCode, 60*5);
 
-//        SendConfirmationCodeJob::dispatch($user, $confirmationCode);
-        Mail::to($user->email)->send(new SendConfirmationCodeMail($confirmationCode));
+        SendConfirmationCodeJob::dispatch($user->email, $confirmationCode);
+//        Mail::to($user->email)->send(new SendConfirmationCodeMail($confirmationCode));
         return \response()->json([
             'message'=>'Code send to user mail',
         ]);
@@ -57,7 +58,7 @@ class AuthUserController extends Controller
             ], 403);
         }
 
-        Cache::forget('confirmation_code' . $email);
+        Cache::forget('confirmation_code_' . $email);
         $user = User::query()->where('email', $email)->first();
         $user['email_verified_at'] = now();
         $user->save();
