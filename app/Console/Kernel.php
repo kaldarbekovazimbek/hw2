@@ -19,7 +19,6 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(BirthdayGreetingsCommand::class)->dailyAt('9:00');
     }
-git
     /**
      * Register the commands for the application.
      */
