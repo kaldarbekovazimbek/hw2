@@ -5,5 +5,9 @@ return [
     'object_with_email_exists'=>'Объект с таким адресом электронной почты уже существует',
     'object_with_number_exists'=>'Объект с таким номером уже существует',
     'object_deleted'=>'Объект успешно удалён',
-    'bad_credentials'=>'Не правильные данные',
+    'invalid_credentials'=>'Не правильные данные',
+    'Code_send'=>'Код отправлен на почту',
+    'email_verified'=>'Почта подтверждена',
+    'email_not_verified'=>'Почта не подтверждена',
+
 ];

@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,7 +22,7 @@ class UserRequest extends FormRequest
             'name'=>['required', 'string', 'max:40'],
             'birthday'=>['required','date','date_format:Y-m-d'],
             'email'=>['required', 'string', 'max:50'],
-            'password'=>['required', 'string', 'min:6', 'max:50'],
+            'password'=> ['required', 'string', 'min:6', 'max:50'],
         ];
     }
 }
